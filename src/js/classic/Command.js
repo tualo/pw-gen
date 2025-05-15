@@ -52,11 +52,64 @@ Ext.define('Tualo.PWGen.commands.Command', {
     ],
     loadRecord: function (record, records, selectedrecords, parent) {
         this.record = record;
-        this.table_name = record.get('table_name');
+
         this.records = records;
 
         this.list = Ext.getCmp(this.calleeId).getComponent('list')
         this.store = this.list.getStore();
+
+        let fields = this.store.getModel().getFieldsMap();
+
+        let has_pwgen_pass = fields['pwgen_pass'] ? true : false;
+        let has_pwgen_id = fields['pwgen_id'] ? true : false;
+        let has_pwgen_user = fields['pwgen_user'] ? true : false;
+        let has_pwgen_hash = fields['pwgen_hash'] ? true : false;
+
+        if (has_pwgen_pass == false) {
+            Ext.toast({
+                html: "Bitte fügen Sie das Feld pwgen_pass in die Tabelle ein.",
+                title: 'Fehler',
+                width: 400,
+                align: 't',
+                iconCls: 'fa fa-warning'
+            });
+        }
+        if (has_pwgen_id == false) {
+            Ext.toast({
+                html: "Bitte fügen Sie das Feld pwgen_id in die Tabelle ein.",
+                title: 'Fehler',
+                width: 400,
+                align: 't',
+                iconCls: 'fa fa-warning'
+            });
+        }
+        if (has_pwgen_user == false) {
+            Ext.toast({
+                html: "Bitte fügen Sie das Feld pwgen_user in die Tabelle ein.",
+                title: 'Fehler',
+                width: 400,
+                align: 't',
+                iconCls: 'fa fa-warning'
+            });
+        }
+        if (has_pwgen_hash == false) {
+            Ext.toast({
+                html: "Bitte fügen Sie das Feld pwgen_hash in die Tabelle ein.",
+                title: 'Fehler',
+                width: 400,
+                align: 't',
+                iconCls: 'fa fa-warning'
+            });
+        }
+
+
+        /*
+                range[me.current].set('pwgen_pass', me.password[me.current].val);
+                range[me.current].set('pwgen_id', me.recordid[me.current].val);
+                range[me.current].set('pwgen_user', me.username[me.current].val);
+                */
+
+        this.table_name = this.store.getProxy().tablename;
         this.selectedrecords = selectedrecords;
         let me = this;
 
@@ -81,6 +134,16 @@ Ext.define('Tualo.PWGen.commands.Command', {
         });
 
         let o = await (await fetch('./pw-gen/' + this.table_name + '/new_unique')).json();
+        if (o.success == false) {
+            Ext.toast({
+                html: "Es ist ein Fehler aufgetreten: " + o.msg,
+                title: 'Fehler',
+                width: 400,
+                align: 't',
+                iconCls: 'fa fa-warning'
+            });
+            return false;
+        }
         progressbar_unique.reset();
         progressbar_unique.updateProgress(1);
         progressbar_unique.updateText(' ');
@@ -207,11 +270,12 @@ Ext.define('Tualo.PWGen.commands.Command', {
                 return {
                     id: item.get('id'),
                     pwgen_user: item.get('pwgen_user'),
-                    pwgen_hash: item.get('pwgen_hash')
+                    pwgen_hash: item.get('pwgen_hash'),
+                    pwgen_id: item.get('pwgen_id')
                 }
             });
 
-        let r = await (await fetch('./pw-gen/set', {
+        let r = await (await fetch('./pw-gen/' + this.table_name + '/set', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

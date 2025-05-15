@@ -1,12 +1,26 @@
 DELIMITER //
 
+CREATE OR REPLACE FUNCTION `randomPWGenString`(length SMALLINT(3),allowedChars varchar(255)) 
+RETURNS varchar(100) CHARSET utf8
+begin
+    SET @returnStr = '';
+    SET @i = 0;
+
+    WHILE (@i < length) DO
+        SET @returnStr = CONCAT(@returnStr, substring(allowedChars, FLOOR(RAND() * LENGTH(allowedChars) + 1), 1));
+        SET @i = @i + 1;
+    END WHILE;
+
+    RETURN @returnStr;
+END //
+
 CREATE OR REPLACE PROCEDURE `createPWGenRandom`(
     in tableName varchar(255),
     in randomLength SMALLINT(3),
     in allowedChars varchar(255), 
     in listLength int(11),
-    in field varchar(255)
-    in uniqueValue bool DEFAULT false
+    in field varchar(255),
+    in uniqueValue boolean
 )
 begin
 
@@ -15,20 +29,16 @@ begin
     declare versioned varchar(255);
     set versioned = '';
 
-    SELECT 
-        TABLE_TYPE
-        INTO versioned
-    FROM 
-        INFORMATION_SCHEMA.TABLES
-    WHERE 
-        TABLE_SCHEMA = database_name
-        AND TABLE_NAME = table_name;
+    set versioned = (select distinct TABLE_TYPE from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = database() and TABLE_NAME = tableName);
 
     if (versioned='SYSTEM VERSIONED') then
         set versioned = 'FOR SYSTEM_TIME ALL';
+    else
+        set versioned = '';
     end if;
 
     set sql_command = concat('create temporary table if not exists temp_random_list (seq bigint , val varchar(',randomLength,') primary key)');
+
     PREPARE stmt FROM sql_command;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
@@ -36,13 +46,17 @@ begin
 
     set c=0;
     while (c< listLength) DO
-        set sql_command = concat('insert ignore into temp_random_list (seq  , val )  select seq,randomString(',randomLength,',"',allowedChars,'") val from seq_1_to_3000');
+        set sql_command = concat('insert ignore into temp_random_list (seq  , val )  select seq,randomPWGenString(',randomLength,',"',allowedChars,'") val from seq_1_to_3000');
+
+
         PREPARE stmt FROM sql_command;
         EXECUTE stmt;
         DEALLOCATE PREPARE stmt;
 
         if (uniqueValue=true) then
             set sql_command = concat('delete from temp_random_list where val in (select `',field,'` from `',tableName,'` ',versioned,')');
+
+
             PREPARE stmt FROM sql_command;
             EXECUTE stmt;
             DEALLOCATE PREPARE stmt;
@@ -52,3 +66,5 @@ begin
     END WHILE;
 
 end //
+
+call createPWGenRandom( 'muc_data' ,8,"1234567890", '1000' ,"pwgen_id",true)
