@@ -65,15 +65,17 @@ Ext.define('Tualo.PWGen.commands.Command', {
         let has_pwgen_user = fields['pwgen_user'] ? true : false;
         let has_pwgen_hash = fields['pwgen_hash'] ? true : false;
 
+
         if (has_pwgen_pass == false) {
             Ext.toast({
-                html: "Bitte fügen Sie das Feld pwgen_pass in die Tabelle ein.",
+                html: "Bitte fügen Sie das Feld pwgen_pass (nur leerer String) in die <b>Lese-Tabelle</b> ein.",
                 title: 'Fehler',
                 width: 400,
                 align: 't',
                 iconCls: 'fa fa-warning'
             });
         }
+
         if (has_pwgen_id == false) {
             Ext.toast({
                 html: "Bitte fügen Sie das Feld pwgen_id in die Tabelle ein.",
@@ -145,16 +147,19 @@ Ext.define('Tualo.PWGen.commands.Command', {
             });
             return false;
         }
+        */
         progressbar_unique.reset();
         progressbar_unique.updateProgress(1);
         progressbar_unique.updateText(' ');
+
+        /*
         me.recordid = o.recordid;
         me.username = o.username;
         me.password = o.password;
         */
         me.current = 0;
         me.blocksize = 2000;
-        console.log(me.current, range.length);
+        console.log('>>>>>', me.current, range.length);
         while ((await me.loopPWRange()) == false) {
 
         };
@@ -202,10 +207,12 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
         if (me.current < range.length) {
             range[0].store.suspendEvents() // true);
+
+            console.log('*****', range, range.length);
             while (i < me.blocksize && me.current < range.length) {
 
 
-                range[me.current].set('pwgen_pass', generateRandomPassword(5, true, false, true, false));
+                range[me.current].set('pwgen_pass', me.generateRandomPassword(5, true, false, true, false));
                 // range[me.current].set('pwgen_id', me.recordid[me.current].val);
                 // range[me.current].set('pwgen_user', me.username[me.current].val);
                 me.current++;
@@ -230,18 +237,20 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
             let pw_list = me.store.getModifiedRecords();
             for (let i = 0; i < pw_list.length; i++) {
-                const salt = bcrypt.genSaltSync(10);
-                const hash = bcrypt.hashSync(item.get('pwgen_pass'), salt);
-                item.set('pwgen_hash', hash);
+                const salt = await bcrypt.genSalt(10);
+                const hash = await bcrypt.hash(pw_list[i].get('pwgen_pass'), salt);
+                progressbar_save.updateProgress((i + 1) / pw_list.length);
+                pw_list[i].set('pwgen_hash', hash);
             }
 
-            rec.set('pwgen_hash', item.pwhash);
             me.store.resumeEvents();
 
-            await me.set();
+            // await me.set();
+            /*
             pw_list.forEach((item) => {
                 item.commit();
             });
+            */
             progressbar_save.updateProgress((me.current + 1) / me.records.length);
             // }
         } catch (e) {
