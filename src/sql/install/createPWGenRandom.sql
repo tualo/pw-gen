@@ -67,4 +67,57 @@ begin
 
 end //
 
-call createPWGenRandom( 'muc_data' ,8,"1234567890", '1000' ,"pwgen_id",true)
+
+CREATE OR REPLACE PROCEDURE `setPWGenRandom`(
+    in tableName varchar(255),
+    in randomName varchar(255),
+    in randomLength SMALLINT(3),
+    in field varchar(255)
+)
+begin
+
+    declare sql_command longtext;
+
+
+    drop table if exists temp_random_update_list;
+    set sql_command = concat('
+    create temporary table if not exists temp_random_update_list 
+    with d as (
+        select row_number() over (order by r) `rank`, id, pwgen_user, r from (
+                select id, pwgen_user,rand() r from `',tableName,'`  where `',field,'` = ',quote(""),' or `',field,'` is null order by r
+        ) sub
+    ),
+    p as (
+        select row_number() over (order by r) `rank`, `random`, r from (
+            select `random`,rand() r from pwgen_precalc where `length` = ',randomLength,' and `name`=',quote(randomName),' and `used`=false order by r
+        ) sub
+    )
+    select d.rank,d.id,d.pwgen_user,d.r, p.rank p_rank, p.random from d join p on d.`rank` = p.`rank`
+    ');
+    select sql_command;
+    PREPARE stmt FROM sql_command;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+
+    for rec in (select id, pwgen_user, random from temp_random_update_list) do
+        drop table if exists temp_random_update_list_exists;
+
+        set sql_command = concat('create temporary table temp_random_update_list_exists select id from `',tableName,'` where `',field,'` = ',quote(rec.random),'  ');
+        PREPARE stmt FROM sql_command;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+
+        if not exists (select id from temp_random_update_list_exists) then
+            set sql_command = concat('update `',tableName,'` set `',field,'` = ',quote(rec.random),' where id = ',quote(rec.id),' ');
+            PREPARE stmt FROM sql_command;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+
+        end if;
+        set sql_command = concat('update pwgen_precalc set used=true where random = ',quote(rec.random),'');
+        PREPARE stmt FROM sql_command;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    end for;
+
+end //

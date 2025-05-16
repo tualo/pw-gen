@@ -28,6 +28,9 @@ class Unique implements IRoute
                 App::result('username', []);
                 App::result('password', []);
 
+
+                //                $con -> options(MYSQLI_OPT_CONNECT_TIMEOUT, 10);
+
                 ini_set('memory_limit', '18G');
                 set_time_limit(120);
                 $c = $db->singleRow('select count(*) as c,database() d from `' . $matches['tablename'] . '`', []);
