@@ -133,6 +133,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
             }
         });
 
+        /*
         let o = await (await fetch('./pw-gen/' + this.table_name + '/new_unique')).json();
         if (o.success == false) {
             Ext.toast({
@@ -150,6 +151,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
         me.recordid = o.recordid;
         me.username = o.username;
         me.password = o.password;
+        */
         me.current = 0;
         me.blocksize = 2000;
         console.log(me.current, range.length);
@@ -164,6 +166,34 @@ Ext.define('Tualo.PWGen.commands.Command', {
     },
 
 
+
+
+    generateRandomPassword: function (length, includeUppercase, includeLowercase, includeNumbers, includeSpecialChars) {
+        const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+        const numberChars = '0123456789';
+        const specialChars = '!@#$%^&*()-=_+[]{}|;:,.<>?/';
+
+        let allChars = '';
+        let password = '';
+
+        if (includeUppercase) allChars += uppercaseChars;
+        if (includeLowercase) allChars += lowercaseChars;
+        if (includeNumbers) allChars += numberChars;
+        if (includeSpecialChars) allChars += specialChars;
+
+        const allCharsLength = allChars.length;
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * allCharsLength);
+            password += allChars.charAt(randomIndex);
+        }
+
+        return password;
+    },
+
+    // 
+
     loopPWRange: async function () {
         let me = this,
             range = me.records,
@@ -173,9 +203,11 @@ Ext.define('Tualo.PWGen.commands.Command', {
         if (me.current < range.length) {
             range[0].store.suspendEvents() // true);
             while (i < me.blocksize && me.current < range.length) {
-                range[me.current].set('pwgen_pass', me.password[me.current].val);
-                range[me.current].set('pwgen_id', me.recordid[me.current].val);
-                range[me.current].set('pwgen_user', me.username[me.current].val);
+
+
+                range[me.current].set('pwgen_pass', generateRandomPassword(5, true, false, true, false));
+                // range[me.current].set('pwgen_id', me.recordid[me.current].val);
+                // range[me.current].set('pwgen_user', me.username[me.current].val);
                 me.current++;
                 i++;
             }
@@ -195,31 +227,15 @@ Ext.define('Tualo.PWGen.commands.Command', {
             progressbar_save = me.getComponent('form').getComponent('progressbar_save')
             ;
         try {
-            // while (me.current < me.records.length) {
+
             let pw_list = me.store.getModifiedRecords();
-            let pws_list = pw_list.map((item) => {
-                return {
-                    id: item.get('__id'),
-                    password: item.get('pwgen_pass')
-                }
-            });
+            for (let i = 0; i < pw_list.length; i++) {
+                const salt = bcrypt.genSaltSync(10);
+                const hash = bcrypt.hashSync(item.get('pwgen_pass'), salt);
+                item.set('pwgen_hash', hash);
+            }
 
-            let r = await (await fetch('./pw-gen/bcrypt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    passwords: pws_list
-                })
-            })).json();
-
-            me.store.suspendEvents();
-            r.data.forEach((item) => {
-                let rec = me.store.findRecord('__id', item.id);
-                rec.set('pwgen_hash', item.pwhash);
-
-            });
+            rec.set('pwgen_hash', item.pwhash);
             me.store.resumeEvents();
 
             await me.set();
