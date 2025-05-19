@@ -26,15 +26,17 @@ class SetPW implements IRoute
                 if (isset($postdata)) {
                     $postdata = json_decode($postdata, true);
                 }
+                $citical = $db->singleValue('select group_concat( concat("`",column_name,"` = {",column_name,"}") ) s from ds_column where table_name = {tablename} and is_primary=1 ', $matches, 's');
+
                 foreach ($postdata as $row) {
                     $sql = '
                     update `' . $matches['tablename'] . '` set 
                         pwgen_hash={pwgen_hash},
                         pwgen_id={pwgen_id},
                         pwgen_user={pwgen_user} 
-                    where 
-                        id = {id}
+                    where ' . $citical . '
                     ';
+
                     $db->direct($sql, $row);
                 }
                 App::result('success', true);

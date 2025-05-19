@@ -290,15 +290,43 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
     set: async function () {
         let me = this;
-        let pw_list = me.store.getModifiedRecords(),
-            data = pw_list.map((item) => {
-                return {
-                    id: item.get('id'),
-                    pwgen_user: item.get('pwgen_user'),
-                    pwgen_hash: item.get('pwgen_hash'),
-                    pwgen_id: item.get('pwgen_id')
+        let pw_list = me.store.getModifiedRecords();
+        let critical = {};
+        let fields = me.store.getModel().getFieldsMap();
+        for (key in fields) {
+            if (
+                fields.hasOwnProperty(key) && (
+                    (fields[key] != null) ||
+                    (me.store.getModel().getField(key).critical)
+                )
+            ) {
+                critical[key] = true;
+            }
+        }
+
+
+        let data = pw_list.map((item) => {
+            let o = {
+                pwgen_user: item.get('pwgen_user'),
+                pwgen_hash: item.get('pwgen_hash'),
+                pwgen_id: item.get('pwgen_id')
+            }
+            for (let key in critical) {
+                if (item.get(key) != null) {
+                    o[key] = item.get(key);
                 }
-            });
+            }
+            return o;
+        });
+
+
+
+
+
+
+
+
+
 
         let r = await (await fetch('./pw-gen/' + this.table_name + '/set', {
             method: 'POST',
