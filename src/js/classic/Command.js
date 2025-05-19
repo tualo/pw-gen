@@ -158,10 +158,10 @@ Ext.define('Tualo.PWGen.commands.Command', {
         me.password = o.password;
         */
         me.current = 0;
-        me.blocksize = 2000;
+        me.blocksize = 2000000;
         console.log('>>>>>', me.current, range.length);
         while ((await me.loopPWRange()) == false) {
-
+            console.log('>>>>>***', me.current, range.length);
         };
 
         me.saveExcel();
@@ -208,7 +208,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
         if (me.current < range.length) {
             range[0].store.suspendEvents() // true);
 
-            console.log('*****', range, range.length);
+            console.log('*****', me.blocksize, me.current, range.length);
             while (i < me.blocksize && me.current < range.length) {
 
 
@@ -245,7 +245,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
             me.store.resumeEvents();
 
-            // await me.set();
+            await me.set();
             /*
             pw_list.forEach((item) => {
                 item.commit();
