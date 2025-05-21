@@ -42,3 +42,6 @@ end //
 -- call fill_pwgen_precalc('pass5',5,'ABCDEFGHJKLMNPRSTUVXYZ123456789',40000) //
 -- call fill_pwgen_precalc('username7',7,'ABCDEFGHJKLMNPRSTUVXYZ123456789',2000000) //
 -- call fill_pwgen_precalc('username8',8,'ABCDEFGHJKLMNPRSTUVXYZ123456789',2000000) //
+
+
+-- call fill_pwgen_precalc('mucnames',8,'ABCDEFGHJKLMNPRSTUVXYZ123456789',2000000) //

@@ -174,9 +174,9 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
 
     generateRandomPassword: function (length, includeUppercase, includeLowercase, includeNumbers, includeSpecialChars) {
-        const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const uppercaseChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
         const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-        const numberChars = '0123456789';
+        const numberChars = '123456789';
         const specialChars = '!@#$%^&*()-=_+[]{}|;:,.<>?/';
 
         let allChars = '';
