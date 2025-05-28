@@ -241,11 +241,15 @@ Ext.define('Tualo.PWGen.commands.Command', {
                 const hash = await bcrypt.hash(pw_list[i].get('pwgen_pass'), salt);
                 progressbar_save.updateProgress((i + 1) / pw_list.length);
                 pw_list[i].set('pwgen_hash', hash);
+
+                if (i % 50 == 0) {
+                    await me.set();
+                }
             }
 
             me.store.resumeEvents();
 
-            await me.set();
+
             /*
             pw_list.forEach((item) => {
                 item.commit();
@@ -335,6 +339,10 @@ Ext.define('Tualo.PWGen.commands.Command', {
             },
             body: JSON.stringify(data)
         })).json();
+
+        pw_list.forEach((item) => {
+            item.commit();
+        });
 
     },
 
