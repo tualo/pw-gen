@@ -246,7 +246,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
                 console.log('Hashing: ' + (i + 1) + '/' + pw_list.length);
 
                 if (i % 50 == 0) {
-                    await me.set();
+                    await me.set(synclist);
                     synclist = [];
                 }
             }
