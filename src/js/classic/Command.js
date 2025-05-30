@@ -234,7 +234,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
             progressbar_save = me.getComponent('form').getComponent('progressbar_save')
             ;
         try {
-
+            let synclist = [];
             let pw_list = me.store.getModifiedRecords();
             for (let i = 0; i < pw_list.length; i++) {
                 const salt = await bcrypt.genSalt(10);
@@ -242,11 +242,12 @@ Ext.define('Tualo.PWGen.commands.Command', {
                 progressbar_save.updateProgress((i + 1) / pw_list.length);
                 pw_list[i].set('pwgen_hash', hash);
 
-
+                synclist.push(pw_list[i]);
                 console.log('Hashing: ' + (i + 1) + '/' + pw_list.length);
 
                 if (i % 50 == 0) {
                     await me.set();
+                    synclist = [];
                 }
             }
 
@@ -295,9 +296,9 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
     },
 
-    set: async function () {
+    set: async function (list) {
         let me = this;
-        let pw_list = me.store.getModifiedRecords();
+        let pw_list = list; // me.store.getModifiedRecords();
         let critical = {};
         let fields = me.store.getModel().getFieldsMap();
         for (key in fields) {
