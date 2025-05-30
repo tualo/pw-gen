@@ -242,10 +242,12 @@ Ext.define('Tualo.PWGen.commands.Command', {
                 progressbar_save.updateProgress((i + 1) / pw_list.length);
                 pw_list[i].set('pwgen_hash', hash);
 
+
+                console.log('Hashing: ' + (i + 1) + '/' + pw_list.length);
+
                 if (i % 50 == 0) {
                     await me.set();
                 }
-                console.log('Hashing: ' + (i + 1) + '/' + pw_list.length);
             }
 
             me.store.resumeEvents();
