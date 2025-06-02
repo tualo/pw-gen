@@ -250,7 +250,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
                     synclist = [];
                 }
             }
-
+            await me.set(synclist);
             me.store.resumeEvents();
 
 
