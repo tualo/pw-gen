@@ -1,24 +1,25 @@
 {
-    "name": "tualo/pw-gen",
-    "description": "pw-gen module for tualo office",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Hoffmann",
-            "email": "thomas.hoffmann@tualo.de"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Tualo\\Office\\PWGen\\": "src/"
-        },
-        "files": [
-            "src/functions.php"
-        ]
-    },
-    "minimum-stability": "dev",
-    "require": {
-        "tualo/bsc": "*"
+  "name": "tualo/pw-gen",
+  "description": "pw-gen module for tualo office",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Hoffmann",
+      "email": "thomas.hoffmann@tualo.de"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Tualo\\Office\\PWGen\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "tualo/bsc": "^1.0.3"
+  },
+  "version": "1.0.1"
 }
