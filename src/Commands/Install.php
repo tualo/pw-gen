@@ -18,7 +18,7 @@ class InstallDDL extends CommandLineInstallSQL  implements ICommandline
     {
         return dirname(__DIR__, 1);
     }
-    public static $shortName  = 'papervote-ddl';
+    public static $shortName  = 'pwgen-ddl';
     public static $files = [
 
 
