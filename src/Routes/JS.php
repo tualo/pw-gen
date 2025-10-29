@@ -7,7 +7,7 @@ use Tualo\Office\Basic\Route as R;
 use Tualo\Office\Basic\IRoute;
 
 
-class JS implements IRoute
+class JS extends \Tualo\Office\Basic\RouteWrapper
 {
     public static function register()
     {

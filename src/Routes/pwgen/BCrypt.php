@@ -13,7 +13,7 @@ use \PhpOffice\PhpSpreadsheet\IOFactory;
 
 use Ramsey\Uuid\Uuid;
 
-class BCrypt implements IRoute
+class BCrypt extends \Tualo\Office\Basic\RouteWrapper
 {
 
     public static function register()

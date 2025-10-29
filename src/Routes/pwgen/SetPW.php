@@ -13,7 +13,7 @@ use \PhpOffice\PhpSpreadsheet\IOFactory;
 
 use Ramsey\Uuid\Uuid;
 
-class SetPW implements IRoute
+class SetPW extends \Tualo\Office\Basic\RouteWrapper
 {
 
     public static function register()
