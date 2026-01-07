@@ -89,7 +89,8 @@ begin
     ),
     p as (
         select row_number() over (order by r) `rank`, `random`, r from (
-            select `random`,rand() r from pwgen_precalc where `length` = ',randomLength,' and `name`=',quote(randomName),' and `used`=false order by r
+            select `random`,rand() r from pwgen_precalc where `length` = ',randomLength,' and `name`=',quote(randomName),' and `used`=false 
+            order by r
         ) sub
     )
     select d.rank,d.id,d.pwgen_user,d.r, p.rank p_rank, p.random from d join p on d.`rank` = p.`rank`
