@@ -121,3 +121,6 @@ begin
     end for;
 
 end //
+
+
+-- call setPWGenRandom('muc_data','username7',7,'pwgen_user');

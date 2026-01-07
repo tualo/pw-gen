@@ -214,7 +214,7 @@ Ext.define('Tualo.PWGen.commands.Command', {
 
                 range[me.current].set('pwgen_pass', me.generateRandomPassword(5, true, false, true, false));
                 // range[me.current].set('pwgen_id', me.recordid[me.current].val);
-                // range[me.current].set('pwgen_user', me.username[me.current].val);
+                range[me.current].set('pwgen_user', me.username[me.current].val);
                 me.current++;
                 i++;
             }
