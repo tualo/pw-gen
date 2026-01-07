@@ -10,8 +10,10 @@ create table if not exists pwgen_precalc(
     key idx_pwgen_precalc_name (name),
     key idx_pwgen_precalc_used (used),
     key idx_pwgen_precalc_length (length),
-    key idx_pwgen_precalc_allowedChars (allowedChars)
-) WITH SYSTEM VERSIONING //
+    key idx_pwgen_precalc_allowedChars (allowedChars),
+    key idx_pwgen_precalc_used_name (used,name)
+) //
+
 
 
 CREATE OR REPLACE PROCEDURE `fill_pwgen_precalc`(
