@@ -93,8 +93,8 @@ class Unique extends \Tualo\Office\Basic\RouteWrapper
                 App::result('username', []);
 
                 try {
-                    App::result('recordid', $db->direct('select pwgen_id from `' . $matches['tablename'] . '` FOR SYSTEM_TIME ALL', [], 'pwgen_id'));
-                    App::result('username', $db->direct('select pwgen_user from `' . $matches['tablename'] . '` FOR SYSTEM_TIME ALL', [], 'pwgen_user'));
+                    App::result('recordid', $db->direct('select pwgen_id from `' . $matches['tablename'] . '`  ', [], 'pwgen_id'));
+                    App::result('username', $db->direct('select pwgen_user from `' . $matches['tablename'] . '` ', [], 'pwgen_user'));
                 } catch (Exception $e) {
                 }
                 App::result('success', true);
