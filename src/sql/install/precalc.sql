@@ -1,6 +1,7 @@
 delimiter //
 create table if not exists pwgen_precalc(
     random varchar(20) not null primary key,
+    seed integer default 0,
     allowedChars varchar(255) not null,
     length SMALLINT(3) not null,
     used boolean default false,
@@ -27,12 +28,12 @@ begin
     declare sql_command longtext;
 
     drop table if exists temp_random_list;
-    set sql_command = concat('create temporary table if not exists temp_random_list  select seq,randomPWGenString(',randomLength,',',quote(allowedChars),') val from seq_1_to_',listLength);
+    set sql_command = concat('create temporary table if not exists temp_random_list  select seq,randomPWGenString(',randomLength,',',quote(allowedChars),') val, floor(rand() * 1000000) seed from seq_1_to_',listLength);
     PREPARE stmt FROM sql_command;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
     
-    set sql_command = concat('insert ignore into pwgen_precalc (random,length,name,allowedChars) select val,',randomLength,',',quote(name),',',quote(allowedChars),' from temp_random_list ');
+    set sql_command = concat('insert delayed ignore  into pwgen_precalc (random,length,name,allowedChars,seed) select val,',randomLength,',',quote(name),',',quote(allowedChars),',seed from temp_random_list ');
 
     PREPARE stmt FROM sql_command;
     EXECUTE stmt;
